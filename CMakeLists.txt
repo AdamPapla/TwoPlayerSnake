@@ -13,7 +13,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
 
 # Define library with game files
 ADD_LIBRARY( SnakeLibModule
-   Snake.cpp Utility.cpp SnakeGameLogic.cpp
+   SnakeGame.cpp Utility.cpp SnakeGameLogic.cpp
 )
 
 # Find and link raylib

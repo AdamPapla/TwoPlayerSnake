@@ -1,5 +1,5 @@
 #include <format>
-#include "Snake.h"
+#include "SnakeGame.h"
 
 void SnakeGame::run() {
    Move currentDirP1 = Move::up;

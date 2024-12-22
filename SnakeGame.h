@@ -1,5 +1,5 @@
-#ifndef SNAKE_H_
-#define SNAKE_H_
+#ifndef SNAKEGAME_H_
+#define SNAKEGAME_H_
 #include <algorithm>
 #include <iostream>
 #include <chrono>
