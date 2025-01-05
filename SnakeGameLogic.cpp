@@ -3,14 +3,17 @@
 void
 SnakeGameLogic::update( Move move, Snake & snake, U32 playerNum ) {
    Block newBlock = makeNextBlock( move, snake );
+   updateTail( newBlock, snake );
    if ( occupied.contains( newBlock ) ) {
-      // Snake dies
       snake.alive = false;
-   } else {
-      occupied.insert( { newBlock, playerNum } );
-      snake.body.push_front( newBlock );
    }
-   if ( newBlock != food ) {
+   snake.body.push_front( newBlock );
+   occupied.insert( { newBlock, playerNum } );
+}
+
+void
+SnakeGameLogic::updateTail( Block newHead, Snake & snake ) {
+   if ( newHead != food && snake.body.size() != 0 ) {
       occupied.erase( snake.body.back() );
       snake.body.pop_back();
    } else {

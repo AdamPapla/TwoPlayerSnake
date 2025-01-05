@@ -70,6 +70,10 @@ class SnakeGameLogic {
    std::optional< U32 > update( Move move1, Move move2 ) {
       update( move1, snake1, 1 );
       update( move2, snake2, 2 );
+      // Handle case where heads collide
+      if ( snake1.body.front() == snake2.body.front() ) {
+         snake1.alive = false;
+      }
       if ( !snake1.alive && !snake2.alive ) {
          winner = 0;
       } else if ( !snake2.alive ) {
@@ -81,6 +85,7 @@ class SnakeGameLogic {
    }
 
    void update( Move move, Snake & snake, U32 playerNum );
+   void updateTail( Block newHead, Snake & snake );
    Block makeNextBlock( Move move, const Snake & snake );
 
 
@@ -89,6 +94,12 @@ class SnakeGameLogic {
    }
    const Block & getFood() {
       return food;
+   }
+   U32 lenSnake1() const {
+      return static_cast< U32 >( snake1.body.size() );
+   }
+   U32 lenSnake2() const {
+      return static_cast< U32 >( snake2.body.size() );
    }
 
  private:

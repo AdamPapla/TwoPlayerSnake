@@ -17,8 +17,10 @@ using Clock = std::chrono::high_resolution_clock;
 class SnakeGame {
  public:
    SnakeGame( U32 wSize, U32 grid ) : gridBlocks { grid },
-                                      highScore { 0 },
-                                      isGameStarted { false } {
+                                      isGameStarted { false },
+                                      scoreP1 { 0 },
+                                      scoreP2 { 0 },
+                                      highScore { 0 } {
       U32 maxGridSize = static_cast< U32 >( wSize * 0.9 );
       blockSize = static_cast< U32 >( maxGridSize / gridBlocks );
       gridSize = blockSize * gridBlocks;
@@ -37,12 +39,14 @@ class SnakeGame {
    }
  private:
    void makeGrid();
+
    void printBlocks( const std::unordered_map< Block, U32 > & blocks ) {
       for ( const auto & [ block, player ] : blocks ) {
          Color color = ( player == 1 ) ? DARKPURPLE : DARKBLUE;
          printBlock( block, color );
       }
    }
+
    void printBlock( const Block & block, const Color color ) {
       U32 xOffset = blockToPosition( block.x );
       U32 yOffset = blockToPosition( block.y );
@@ -75,6 +79,26 @@ class SnakeGame {
       return direction;
    }
 
+   void handleInput() {
+      currentDirP1 = handleInputWasd( currentDirP1 );
+      if ( numPlayers == 2 ) {
+         currentDirP2 = handleInputArrows( currentDirP2 );
+      }
+   }
+
+   void updateScore() {
+      if ( numPlayers == 1 ) {
+         scoreP1 = snakeLogic->lenSnake1();
+         highScore = std::max( scoreP1, highScore );
+      } else {
+         if ( winner.value() == 1 ) {
+            ++scoreP1;
+         } else if ( winner.value() == 2 ) {
+            ++scoreP2;
+         }
+      }
+   }
+
    U32 blockToPosition( U32 blockNum ) {
       return borderWidth + blockSize * blockNum;
    }
@@ -88,12 +112,16 @@ class SnakeGame {
    }
 
    const U32 gridBlocks;
-   U32 highScore;
    bool isGameStarted;
+
+   Move currentDirP1;
+   Move currentDirP2;
 
    std::optional< U32 > winner;
    U32 numPlayers;
-   U32 score;
+   U32 scoreP1;
+   U32 scoreP2;
+   U32 highScore;
    U32 gridSize;
    U32 blockSize;
    U32 borderWidth;
