@@ -1,14 +1,10 @@
 #include "SnakeGameLogic.h"
 
 void
-SnakeGameLogic::update( Move move, Snake & snake, U32 playerNum ) {
+SnakeGameLogic::updateSnake( Move move, Snake & snake, U32 playerNum ) {
    Block newBlock = makeNextBlock( move, snake );
    updateTail( newBlock, snake );
-   if ( occupied.contains( newBlock ) ) {
-      snake.alive = false;
-   }
    snake.body.push_front( newBlock );
-   occupied.insert( { newBlock, playerNum } );
 }
 
 void
@@ -17,6 +13,27 @@ SnakeGameLogic::updateTail( Block newHead, Snake & snake ) {
       occupied.erase( snake.body.back() );
       snake.body.pop_back();
    } else {
+      foodRequired = true;
+   }
+}
+
+void
+SnakeGameLogic::updatePostMoves() {
+   if ( snake1.head() == snake2.head() ) {
+      snake1.alive = false;
+      snake2.alive = false;
+      return;
+   }
+   if ( occupied.contains(snake1.head()) ) {
+      snake1.alive = false;
+   }
+   if ( occupied.contains(snake2.head()) ) {
+      snake2.alive = false;
+   }
+   // Now that we've checked if the snake has died, update the new head positions
+   occupied.emplace( snake1.head(), 1 );
+   occupied.emplace( snake2.head(), 2 );
+   if ( foodRequired ) {
       spawnFood();
    }
 }
@@ -28,6 +45,7 @@ SnakeGameLogic::spawnFood() {
       newFood = Block( distrib( rng ), distrib( rng ), blockSize );
    }
    food = newFood;
+   foodRequired = false;
 }
 
 Block

@@ -50,7 +50,11 @@ class SnakeGame {
    void printBlock( const Block & block, const Color color ) {
       U32 xOffset = blockToPosition( block.x );
       U32 yOffset = blockToPosition( block.y );
+      Texture2D bodyTexture = LoadTexture( "bodyTexture.png" );
       DrawRectangle( xOffset, yOffset, blockSize - 1, blockSize - 1, color );
+      float scaleFactor = blockSize / 32.0;
+      Vector2 position = { (float) xOffset, (float) yOffset };
+      DrawTextureEx( bodyTexture, position , 0.0f, scaleFactor, color );
    }
 
    Move handleInputWasd( Move direction ) {

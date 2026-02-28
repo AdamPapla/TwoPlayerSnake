@@ -45,6 +45,7 @@ namespace std {
 
 struct Snake {
    Snake() : alive { true } {}
+   const Block head() const { return body.front(); }
    std::deque< Block > body;
    bool alive;
 };
@@ -68,12 +69,20 @@ class SnakeGameLogic {
    }
 
    std::optional< U32 > update( Move move1, Move move2 ) {
-      update( move1, snake1, 1 );
-      update( move2, snake2, 2 );
-      // Handle case where heads collide
-      if ( snake1.body.front() == snake2.body.front() ) {
+      const Block& oldHead1 = snake1.head();
+      const Block& oldHead2 = snake2.head();
+      // Update the snakes positions
+      updateSnake( move1, snake1, 1 );
+      updateSnake( move2, snake2, 2 );
+      // Check death conditions and handle spawning food
+      updatePostMoves();
+      // Handle edge case where one-block snakes' heads pass through each other - death for
+      // both players
+      if ( snake1.head() == oldHead2 && snake2.head() == oldHead1 ) {
          snake1.alive = false;
+         snake2.alive = false;
       }
+      // Set winner
       if ( !snake1.alive && !snake2.alive ) {
          winner = 0;
       } else if ( !snake2.alive ) {
@@ -84,10 +93,9 @@ class SnakeGameLogic {
       return winner;
    }
 
-   void update( Move move, Snake & snake, U32 playerNum );
-   void updateTail( Block newHead, Snake & snake );
+   void updateSnake( Move move, Snake & snake, U32 playerNum );
+   void updatePostMoves();
    Block makeNextBlock( Move move, const Snake & snake );
-
 
    const std::unordered_map< Block, U32 > & getBlocks() {
       return occupied;
@@ -104,6 +112,9 @@ class SnakeGameLogic {
 
  private:
    void spawnFood();
+   void updateTail( Block newHead, Snake & snake );
+
+   bool foodRequired { false };
 
    U32 blockSize;
    U32 gridBlocks;
