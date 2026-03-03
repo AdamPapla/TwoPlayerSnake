@@ -1,0 +1,32 @@
+BasedOnStyle: LLVM
+
+ColumnLimit: 85
+IndentWidth: 3
+UseTab: Never
+
+# Bracket spacing
+SpacesInAngles: true
+SpacesInSquareBrackets: true
+SpacesInParens: Custom
+SpacesInParensOptions:
+  InEmptyParentheses: false
+  Other: true
+
+# Other spacing
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+
+# Line break behavior
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortLambdasOnASingleLine: true
+BreakBeforeBraces: Attach
+AlwaysBreakAfterReturnType: TopLevelDefinitions
+AlwaysBreakTemplateDeclarations: Yes
+
+# Function declaration behavior
+ReferenceAlignment: Middle
+BinPackArguments: false
+BinPackParameters: false
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true

@@ -1,26 +1,24 @@
 #ifndef SNAKEGAME_H_
 #define SNAKEGAME_H_
-#include <algorithm>
-#include <iostream>
-#include <chrono>
-#include <thread>
-#include <deque>
-#include <random>
-#include <unordered_set>
-#include <unordered_map>
-#include "raylib.h"
-#include "Utility.h"
 #include "SnakeGameLogic.h"
+#include "Utility.h"
+#include "raylib.h"
+#include <algorithm>
+#include <chrono>
+#include <deque>
+#include <iostream>
+#include <random>
+#include <thread>
+#include <unordered_map>
+#include <unordered_set>
 
 using namespace std::chrono_literals;
 using Clock = std::chrono::high_resolution_clock;
 class SnakeGame {
  public:
-   SnakeGame( U32 wSize, U32 grid ) : gridBlocks { grid },
-                                      isGameStarted { false },
-                                      scoreP1 { 0 },
-                                      scoreP2 { 0 },
-                                      highScore { 0 } {
+   SnakeGame( U32 wSize, U32 grid )
+       : gridBlocks{ grid }, isGameStarted{ false }, scoreP1{ 0 }, scoreP2{ 0 },
+         highScore{ 0 } {
       U32 maxGridSize = static_cast< U32 >( wSize * 0.9 );
       blockSize = static_cast< U32 >( maxGridSize / gridBlocks );
       gridSize = blockSize * gridBlocks;
@@ -34,9 +32,8 @@ class SnakeGame {
    void startScreen();
    void deathScreen();
 
-   ~SnakeGame() {
-      CloseWindow();
-   }
+   ~SnakeGame() { CloseWindow(); }
+
  private:
    void makeGrid();
 
@@ -53,8 +50,8 @@ class SnakeGame {
       Texture2D bodyTexture = LoadTexture( "bodyTexture.png" );
       DrawRectangle( xOffset, yOffset, blockSize - 1, blockSize - 1, color );
       float scaleFactor = blockSize / 32.0;
-      Vector2 position = { (float) xOffset, (float) yOffset };
-      DrawTextureEx( bodyTexture, position , 0.0f, scaleFactor, color );
+      Vector2 position = { (float)xOffset, (float)yOffset };
+      DrawTextureEx( bodyTexture, position, 0.0f, scaleFactor, color );
    }
 
    Move handleInputWasd( Move direction ) {
@@ -73,11 +70,11 @@ class SnakeGame {
    Move handleInputArrows( Move direction ) {
       if ( IsKeyDown( KEY_LEFT ) ) {
          return Move::left;
-      } else if ( IsKeyDown( KEY_RIGHT )) {
+      } else if ( IsKeyDown( KEY_RIGHT ) ) {
          return Move::right;
-      } else if ( IsKeyDown( KEY_DOWN )) {
+      } else if ( IsKeyDown( KEY_DOWN ) ) {
          return Move::down;
-      } else if ( IsKeyDown( KEY_UP )) {
+      } else if ( IsKeyDown( KEY_UP ) ) {
          return Move::up;
       }
       return direction;
@@ -103,9 +100,7 @@ class SnakeGame {
       }
    }
 
-   U32 blockToPosition( U32 blockNum ) {
-      return borderWidth + blockSize * blockNum;
-   }
+   U32 blockToPosition( U32 blockNum ) { return borderWidth + blockSize * blockNum; }
 
    U32 offsetPosition( double gridFraction ) {
       return static_cast< U32 >( borderWidth + gridFraction * gridSize );

@@ -24,10 +24,10 @@ SnakeGameLogic::updatePostMoves() {
       snake2.alive = false;
       return;
    }
-   if ( occupied.contains(snake1.head()) ) {
+   if ( occupied.contains( snake1.head() ) ) {
       snake1.alive = false;
    }
-   if ( occupied.contains(snake2.head()) ) {
+   if ( occupied.contains( snake2.head() ) ) {
       snake2.alive = false;
    }
    // Now that we've checked if the snake has died, update the new head positions
@@ -40,7 +40,7 @@ SnakeGameLogic::updatePostMoves() {
 
 void
 SnakeGameLogic::spawnFood() {
-   Block newFood ( distrib( rng ), distrib( rng ), blockSize );
+   Block newFood( distrib( rng ), distrib( rng ), blockSize );
    while ( occupied.contains( newFood ) ) {
       newFood = Block( distrib( rng ), distrib( rng ), blockSize );
    }
@@ -52,25 +52,25 @@ Block
 SnakeGameLogic::makeNextBlock( Move move, const Snake & snake ) {
    U32 xOld = snake.body.front().x;
    U32 yOld = snake.body.front().y;
-   Block newBlock ( xOld, yOld, blockSize );
-   switch( move ) {
-      // Add gridBlocks to ensure we don't take modulo of negative number
-      case Move::left:
-         newBlock.x = ( xOld - 1 + gridBlocks ) % gridBlocks;
-         break;
-      case Move::right:
-         newBlock.x = ( xOld + 1 + gridBlocks ) % gridBlocks;
-         break;
-      case Move::down:
-         newBlock.y = ( yOld + 1 + gridBlocks ) % gridBlocks;
-         break;
-      case Move::up:
-         newBlock.y = ( yOld - 1 + gridBlocks ) % gridBlocks;
-         break;
-      case Move::stay:
-         break;
-      default:
-         break;
+   Block newBlock( xOld, yOld, blockSize );
+   switch ( move ) {
+   // Add gridBlocks to ensure we don't take modulo of negative number
+   case Move::left:
+      newBlock.x = ( xOld - 1 + gridBlocks ) % gridBlocks;
+      break;
+   case Move::right:
+      newBlock.x = ( xOld + 1 + gridBlocks ) % gridBlocks;
+      break;
+   case Move::down:
+      newBlock.y = ( yOld + 1 + gridBlocks ) % gridBlocks;
+      break;
+   case Move::up:
+      newBlock.y = ( yOld - 1 + gridBlocks ) % gridBlocks;
+      break;
+   case Move::stay:
+      break;
+   default:
+      break;
    }
    return newBlock;
 }

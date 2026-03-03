@@ -1,16 +1,16 @@
-#include <queue>
-#include <thread>
 #include <condition_variable>
 #include <mutex>
 #include <optional>
+#include <queue>
+#include <thread>
 
 // A simple thread safe queue for passing data between threads
-template< typename T >
+template < typename T >
 class TSQueue {
  public:
    T pop() {
       std::unique_lock< std::mutex > lk( mutex_ );
-      cv_.wait( lk, [ this ]{ return !queue_.empty(); });
+      cv_.wait( lk, [ this ] { return !queue_.empty(); } );
       T val = std::move( queue_.front() );
       queue_.pop();
       return std::move( val );
@@ -30,7 +30,7 @@ class TSQueue {
       std::lock_guard< std::mutex > lk( mutex_ );
       return queue_.size();
    }
-   
+
  private:
    mutable std::mutex mutex_;
    std::condition_variable cv_;

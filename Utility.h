@@ -2,12 +2,6 @@
 
 #include <string>
 
-enum class Move {
-   left,
-   right,
-   up,
-   down,
-   stay
-};
+enum class Move { left, right, up, down, stay };
 
 std::string getDir( Move move );

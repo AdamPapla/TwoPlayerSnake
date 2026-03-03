@@ -1,7 +1,8 @@
-#include <format>
 #include "SnakeGame.h"
+#include <format>
 
-void SnakeGame::run() {
+void
+SnakeGame::run() {
    currentDirP1 = Move::up;
    currentDirP2 = Move::down;
    std::chrono::time_point< Clock > frameStart = Clock::now();
@@ -36,8 +37,9 @@ void SnakeGame::run() {
    }
 }
 
-void SnakeGame::header() {
-   DrawText( "SNAKE", 
+void
+SnakeGame::header() {
+   DrawText( "SNAKE",
              offsetPosition( 0.45 ),
              scaledSize( 0.01 ),
              scaledSize( 0.05 ),
@@ -45,7 +47,7 @@ void SnakeGame::header() {
    if ( snakeLogic ) {
       std::string score1;
       std::string score2;
-      if ( numPlayers == 1 )  {
+      if ( numPlayers == 1 ) {
          score1 = std::format( "Score:{}", snakeLogic->lenSnake1() );
          score2 = std::format( "High Score:{}", highScore );
       } else {
@@ -65,7 +67,8 @@ void SnakeGame::header() {
    }
 }
 
-void SnakeGame::startScreen() {
+void
+SnakeGame::startScreen() {
    DrawRectangle( offsetPosition( 0.25 ),
                   offsetPosition( 0.25 ),
                   scaledSize( 0.5 ),
@@ -81,41 +84,46 @@ void SnakeGame::startScreen() {
              offsetPosition( 0.55 ),
              scaledSize( 0.03 ),
              DARKGRAY );
-   if ( IsKeyDown( KEY_ONE ) ){
+   if ( IsKeyDown( KEY_ONE ) ) {
       numPlayers = 1;
       isGameStarted = true;
-      snakeLogic = std::make_unique< SnakeGameLogic >( blockSize, gridBlocks, numPlayers );
+      snakeLogic =
+          std::make_unique< SnakeGameLogic >( blockSize, gridBlocks, numPlayers );
    } else if ( IsKeyDown( KEY_TWO ) ) {
       numPlayers = 2;
       isGameStarted = true;
-      snakeLogic = std::make_unique< SnakeGameLogic >( blockSize, gridBlocks, numPlayers );
+      snakeLogic =
+          std::make_unique< SnakeGameLogic >( blockSize, gridBlocks, numPlayers );
    }
 }
 
-void SnakeGame::deathScreen() {
+void
+SnakeGame::deathScreen() {
    std::string winnerMsg;
    std::string scoreMsg;
-   if ( numPlayers == 1 ){
+   if ( numPlayers == 1 ) {
       winnerMsg = "You died :(";
       scoreMsg = std::format( "Your Score: {}\nHigh Score: {}", scoreP1, highScore );
    } else if ( winner.value() == 0 ) {
       winnerMsg = "You both lose :(";
-      scoreMsg = std::format( "Player One Score: {}\nPlayer Two Score: {}", scoreP1, scoreP2 );
+      scoreMsg = std::format(
+          "Player One Score: {}\nPlayer Two Score: {}", scoreP1, scoreP2 );
    } else {
       winnerMsg = std::format( "Player {} wins", winner.value() );
-      scoreMsg = std::format( "Player One Score: {}\nPlayer Two Score: {}", scoreP1, scoreP2 );
+      scoreMsg = std::format(
+          "Player One Score: {}\nPlayer Two Score: {}", scoreP1, scoreP2 );
    }
    DrawRectangle( offsetPosition( 0.25 ),
                   offsetPosition( 0.25 ),
-                  scaledSize( 0.5 ), 
-                  scaledSize( 0.5 ), 
+                  scaledSize( 0.5 ),
+                  scaledSize( 0.5 ),
                   LIGHTGRAY );
-   DrawText( winnerMsg.c_str(), 
+   DrawText( winnerMsg.c_str(),
              offsetPosition( 0.3 ),
              offsetPosition( 0.45 ),
              scaledSize( 0.05 ),
              DARKGRAY );
-   DrawText( scoreMsg.c_str(), 
+   DrawText( scoreMsg.c_str(),
              offsetPosition( 0.3 ),
              offsetPosition( 0.55 ),
              scaledSize( 0.03 ),
@@ -126,14 +134,16 @@ void SnakeGame::deathScreen() {
              scaledSize( 0.03 ),
              DARKGRAY );
    if ( IsKeyDown( KEY_SPACE ) ) {
-      snakeLogic = std::make_unique< SnakeGameLogic >( blockSize, gridBlocks, numPlayers );
+      snakeLogic =
+          std::make_unique< SnakeGameLogic >( blockSize, gridBlocks, numPlayers );
       winner = std::nullopt;
    } else if ( IsKeyDown( KEY_ESCAPE ) ) {
       exit( 1 );
    }
 }
 
-void SnakeGame::makeGrid() {
+void
+SnakeGame::makeGrid() {
    // Draw horizontal lines
    for ( U32 i = 0; i <= gridBlocks; ++i ) {
       const U32 constOffset = borderWidth + blockSize * i;
