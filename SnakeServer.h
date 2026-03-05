@@ -41,7 +41,9 @@ class SnakeServer {
    }
    void listen() {
       listenSock_ = socket( AF_INET, SOCK_STREAM, 0 );
-      assert( listenSock_ != -1 );
+      if ( listenSock_ != -1 ) {
+         throw std::runtime_error( "Failed to open listening socket" );
+      }
       sockaddr_in addr{};
       addr.sin_family = config_.family;
       addr.sin_addr.s_addr = INADDR_ANY;
