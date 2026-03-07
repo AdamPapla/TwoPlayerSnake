@@ -13,8 +13,9 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
 
 # Define library with game files
 ADD_LIBRARY( SnakeLibModule
-   SnakeGame.cpp Utility.cpp SnakeGameLogic.cpp
+   SnakeGame.cpp Utility.cpp SnakeGameLogic.cpp Serdes.cpp
 )
+target_include_directories(SnakeLibModule PUBLIC ${CMAKE_SOURCE_DIR})
 
 # Find and link raylib
 target_link_libraries( SnakeLibModule -lraylib )
@@ -25,6 +26,29 @@ include_directories(/usr/local/include)
 ADD_EXECUTABLE( SnakeGame main.cpp )
 
 target_link_libraries( SnakeGame SnakeLibModule )
+
+find_package(GTest REQUIRED)
+
+# Testing
+set(TEST_FILES 
+    test/SerdesRoundtripTest.cpp
+)
+
+# Add and link test executables
+foreach(TEST_FILE ${TEST_FILES})
+    get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
+    add_executable(${TEST_NAME} ${TEST_FILE})
+    target_link_libraries(${TEST_NAME} PRIVATE SnakeLibModule GTest::GTest GTest::Main)
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+endforeach()
+
+enable_testing()
+
+# Enable Clang-Tidy
+find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+if(CLANG_TIDY_EXE)
+    set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
+endif()
 
 # Custom clean target (optional, mirrors Makefile clean behavior)
 add_custom_target(clean-all
