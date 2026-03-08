@@ -47,40 +47,64 @@ struct Snake {
 
 class SnakeGameLogic {
  public:
-   SnakeGameLogic( U32 bSize, U32 blocks, U32 nPlayers );
-
-   std::optional< U32 > update( Move move1, Move move2 );
+   SnakeGameLogic( U32 bSize, U32 blocks, bool singlePlayer );
 
    void applySnapshot( const GameState::Snapshot & snapshot );
+   void updateSnakes( const std::unordered_map< ClientId, Move > & moves ) {
+      for ( const auto & [ id, move ] : moves ) {
+         updateSnake( id, move );
+      }
+      updatePostMoves();
+   }
+
+   U32 getScore( ClientId snakeId ) {
+      if ( snakes.contains( snakeId ) ) {
+         return lenSnake( snakeId );
+      } else if ( finalScores.contains( snakeId ) ) {
+         return finalScores.at( snakeId );
+      }
+      return 0;
+   }
 
    const std::unordered_map< Block, U32 > & getBlocks() { return occupied; }
-   const Block & getFood() { return food; }
-   U32 lenSnake1() const { return static_cast< U32 >( snake1.body.size() ); }
-   U32 lenSnake2() const { return static_cast< U32 >( snake2.body.size() ); }
+   const std::unordered_set< Block > & getFood() { return foods; }
+
+   std::optional< int > getWinner() {
+      if ( snakes.empty() ) {
+         return -1; // No winner
+      } else if ( snakes.size() == 1 ) {
+         return snakes.begin()->first;
+      }
+      return std::nullopt;
+   }
 
  private:
-   void updateSnake( Move move, Snake & snake, U32 playerNum );
-   void updateTail( Block newHead, Snake & snake );
+   Snake & createSnake( const ClientId snakeId, Block block );
+   auto deleteSnake( const ClientId snakeId );
+   void updateSnake( ClientId snakeId, Move move );
+   void updateTail( Snake & snake );
    void updatePostMoves();
+   void cleanupDeadSnakes();
+   U32 lenSnake( ClientId clientId ) const;
 
    Block makeNextBlock( Move move, const Snake & snake );
 
    void spawnFood();
 
-   bool foodRequired{ false };
+   U32 foodRequired{ 0 };
 
    U32 blockSize;
    U32 gridBlocks;
-   U32 numPlayers;
+   bool singlePlayer;
 
    std::uniform_int_distribution<> distrib;
    std::mt19937 rng; // Standard mersenne_twister_engine seeded with rd()
 
-   Snake snake1;
-   Snake snake2;
-
    std::unordered_map< ClientId, Snake > snakes;
    std::unordered_set< Block > foods;
+   std::unordered_map< ClientId, U32 > finalScores;
+
+   std::unordered_map< Block, ClientId > oldHeads;
 
    std::unordered_map< Block, U32 > occupied;
    std::optional< U32 > winner;

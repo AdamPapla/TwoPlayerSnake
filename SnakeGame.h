@@ -44,6 +44,13 @@ class SnakeGame {
       }
    }
 
+   void printBlocks( const std::unordered_set< Block > & blocks ) {
+      for ( const auto & block : blocks ) {
+         Color color = DARKGRAY;
+         printBlock( block, color );
+      }
+   }
+
    void printBlock( const Block & block, const Color color ) {
       U32 xOffset = blockToPosition( block.x );
       U32 yOffset = blockToPosition( block.y );
@@ -82,14 +89,14 @@ class SnakeGame {
 
    void handleInput() {
       currentDirP1 = handleInputWasd( currentDirP1 );
-      if ( numPlayers == 2 ) {
+      if ( !singlePlayer ) {
          currentDirP2 = handleInputArrows( currentDirP2 );
       }
    }
 
    void updateScore() {
-      if ( numPlayers == 1 ) {
-         scoreP1 = snakeLogic->lenSnake1();
+      if ( singlePlayer ) {
+         scoreP1 = snakeLogic->getScore( 1 );
          highScore = std::max( scoreP1, highScore );
       } else {
          if ( winner.value() == 1 ) {
@@ -116,8 +123,8 @@ class SnakeGame {
    Move currentDirP1;
    Move currentDirP2;
 
-   std::optional< U32 > winner;
-   U32 numPlayers;
+   std::optional< int > winner;
+   bool singlePlayer;
    U32 scoreP1;
    U32 scoreP2;
    U32 highScore;
