@@ -1,16 +1,14 @@
 #ifndef SNAKEGAMELOGIC_H_
 #define SNAKEGAMELOGIC_H_
 #include "Utility.h"
-#include "raylib.h"
-#include <algorithm>
 #include <chrono>
 #include <deque>
-#include <iostream>
 #include <optional>
 #include <random>
-#include <thread>
 #include <unordered_map>
 #include <unordered_set>
+
+#include "GameState.h"
 
 using namespace std::chrono_literals;
 using Clock = std::chrono::high_resolution_clock;
@@ -49,50 +47,11 @@ struct Snake {
 
 class SnakeGameLogic {
  public:
-   SnakeGameLogic( U32 bSize, U32 blocks, U32 nPlayers )
-       : blockSize{ bSize }, gridBlocks{ blocks }, numPlayers{ nPlayers } {
-      snake1.body.push_front( Block( 2, 2, bSize ) );
-      if ( numPlayers == 2 ) {
-         snake2.body.push_front( Block( gridBlocks - 2, gridBlocks - 2, bSize ) );
-      }
+   SnakeGameLogic( U32 bSize, U32 blocks, U32 nPlayers );
 
-      // Seed the rng
-      std::random_device rd;
-      rng =
-          std::mt19937( rd() ); // Standard mersenne_twister_engine seeded with rd()
-      distrib = std::uniform_int_distribution<>( 0, gridBlocks - 1 );
+   std::optional< U32 > update( Move move1, Move move2 );
 
-      spawnFood();
-   }
-
-   std::optional< U32 > update( Move move1, Move move2 ) {
-      const Block & oldHead1 = snake1.head();
-      const Block & oldHead2 = snake2.head();
-      // Update the snakes positions
-      updateSnake( move1, snake1, 1 );
-      updateSnake( move2, snake2, 2 );
-      // Check death conditions and handle spawning food
-      updatePostMoves();
-      // Handle edge case where one-block snakes' heads pass through each other -
-      // death for both players
-      if ( snake1.head() == oldHead2 && snake2.head() == oldHead1 ) {
-         snake1.alive = false;
-         snake2.alive = false;
-      }
-      // Set winner
-      if ( !snake1.alive && !snake2.alive ) {
-         winner = 0;
-      } else if ( !snake2.alive ) {
-         winner = 1;
-      } else if ( !snake1.alive ) {
-         winner = 2;
-      }
-      return winner;
-   }
-
-   void updateSnake( Move move, Snake & snake, U32 playerNum );
-   void updatePostMoves();
-   Block makeNextBlock( Move move, const Snake & snake );
+   void applySnapshot( const GameState::Snapshot & snapshot );
 
    const std::unordered_map< Block, U32 > & getBlocks() { return occupied; }
    const Block & getFood() { return food; }
@@ -100,8 +59,13 @@ class SnakeGameLogic {
    U32 lenSnake2() const { return static_cast< U32 >( snake2.body.size() ); }
 
  private:
-   void spawnFood();
+   void updateSnake( Move move, Snake & snake, U32 playerNum );
    void updateTail( Block newHead, Snake & snake );
+   void updatePostMoves();
+
+   Block makeNextBlock( Move move, const Snake & snake );
+
+   void spawnFood();
 
    bool foodRequired{ false };
 
@@ -114,6 +78,9 @@ class SnakeGameLogic {
 
    Snake snake1;
    Snake snake2;
+
+   std::unordered_map< ClientId, Snake > snakes;
+   std::unordered_set< Block > foods;
 
    std::unordered_map< Block, U32 > occupied;
    std::optional< U32 > winner;

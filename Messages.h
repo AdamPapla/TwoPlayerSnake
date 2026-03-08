@@ -67,4 +67,4 @@ struct Snapshot : ServerMessage {
    std::vector< std::uint8_t > bytes;
 };
 
-}
+} // namespace Message
