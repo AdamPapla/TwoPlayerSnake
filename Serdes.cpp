@@ -45,9 +45,8 @@ write( const Snapshot & snapshot ) {
 }
 
 Snapshot
-read( std::span< std::uint8_t > bytes ) {
+read( BytesReader & reader ) {
    Snapshot snapshot;
-   BytesReader reader( bytes );
    auto numSnakes = reader.read< std::uint16_t >();
    snapshot.snakes.resize( numSnakes );
    for ( uint16_t i = 0; i < numSnakes; ++i ) {
