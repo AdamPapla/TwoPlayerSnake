@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstring>
 #include <optional>
+#include <variant>
 #include <vector>
 
 #include "Utility.h"
@@ -11,35 +12,32 @@ namespace Message {
 
 enum class ClientMessageType : std::uint16_t { REGISTER, JOIN, CHANGE_DIR, LEAVE };
 
-struct ClientMessage {
+struct ClientMessageBase {
    ClientMessageType msgType;
 };
 
-struct RegisterMessage : ClientMessage {
+struct RegisterMessage : ClientMessageBase {
+   std::uint8_t nameLen;
    std::string name;
-   std::optional< ClientId > existingClientId_;
+   std::optional< ClientId > existingClientId;
 };
 
-struct JoinMessage : ClientMessage {
-   std::string roomId;
+struct JoinMessage : ClientMessageBase {
+   std::uint32_t roomId;
 };
 
-struct ChangeDirMessage : ClientMessage {
+struct ChangeDirMessage : ClientMessageBase {
    Move newDir;
 };
 
-struct LeaveMessage : ClientMessage {};
+struct LeaveMessage : ClientMessageBase {};
 
 enum class ServerMessageType : std::uint16_t {
    // Ack/Nack client messages
    REGISTER_ACK,
-   REGISTER_NACK,
    JOIN_ACK,
-   JOIN_NACK,
    CHANGE_DIR_ACK,
-   CHANGE_DIR_NACK,
    LEAVE_ACK,
-   LEAVE_NACK,
 
    // Server response messages
    DISCONNECT,
@@ -47,24 +45,37 @@ enum class ServerMessageType : std::uint16_t {
    SNAPSHOT
 };
 
-struct ServerMessage {
+struct ServerMessageBase {
    ServerMessageType msgType;
 };
 
-struct RegisterAckMessage : ServerMessage {
-   ClientId id;
+enum class NackReason : std::uint16_t {
+   // TODO: This will be expanded as needed, placeholder for now
+   UNSET
 };
 
-struct DisconnectMessage : ServerMessage {
+struct AckMessage : ServerMessageBase {
+   ClientId id;
+   NackReason reason;
+};
+
+struct DisconnectMessage : ServerMessageBase {
+   std::uint16_t reasonLen;
    std::string reason;
 };
 
-struct DeathMessage : ServerMessage {
+struct DeathMessage : ServerMessageBase {
    uint32_t score;
 };
 
-struct Snapshot : ServerMessage {
+struct SnapshotMessage : ServerMessageBase {
+   uint32_t snapshotLen;
    std::vector< std::uint8_t > bytes;
 };
+
+using ClientMessage =
+    std::variant< RegisterMessage, JoinMessage, ChangeDirMessage, LeaveMessage >;
+using ServerMessage =
+    std::variant< AckMessage, DisconnectMessage, DeathMessage, SnapshotMessage >;
 
 } // namespace Message
