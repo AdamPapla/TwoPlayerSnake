@@ -17,9 +17,9 @@ struct ClientMessageBase {
 };
 
 struct RegisterMessage : ClientMessageBase {
+   ClientId existingClientId; // 0 is sentinel/null value
    std::uint8_t nameLen;
    std::string name;
-   std::optional< ClientId > existingClientId;
 };
 
 struct JoinMessage : ClientMessageBase {
