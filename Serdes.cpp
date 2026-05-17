@@ -15,16 +15,17 @@ narrow_size( const std::vector< T > & vec ) {
 // another to write to it. Keep them coupled to avoid a mismatch between fields
 // counted and fields written
 template < typename BytesOperator >
-void
+bool
 serialize( const Snapshot & snapshot, BytesOperator & writer ) {
-   writer.write( narrow_size( snapshot.snakes ) );
+   bool success = writer.write( narrow_size( snapshot.snakes ) );
    for ( auto & snake : snapshot.snakes ) {
-      writer.write( snake.id );
-      writer.write( narrow_size( snake.blocks ) );
-      writer.writeBytes( snake.blocks.data(), snake.blocks.size() );
+      success &= writer.write( snake.id );
+      success &= writer.write( narrow_size( snake.blocks ) );
+      success &= writer.writeBytes( snake.blocks.data(), snake.blocks.size() );
    }
-   writer.write( narrow_size( snapshot.food ) );
-   writer.writeBytes( snapshot.food.data(), snapshot.food.size() );
+   success &= writer.write( narrow_size( snapshot.food ) );
+   success &= writer.writeBytes( snapshot.food.data(), snapshot.food.size() );
+   return success;
 }
 
 } // namespace
@@ -32,7 +33,7 @@ namespace Serdes {
 
 using namespace GameState;
 std::vector< uint8_t >
-write( const Snapshot & snapshot ) {
+writeSnapshot( const Snapshot & snapshot ) {
    BytesCounter counter;
    serialize( snapshot, counter );
    std::vector< std::uint8_t > byteStream( counter.count );
@@ -44,20 +45,23 @@ write( const Snapshot & snapshot ) {
    return byteStream;
 }
 
+// TODO: Revisit this functionality now that read returns optional
+// We now don't really need bounds checking here - we can just read directly from
+// bytes since message is guaranteed to be well-formed at this point.
 Snapshot
-read( BytesReader & reader ) {
+readSnapshot( BytesReader & reader ) {
    Snapshot snapshot;
-   auto numSnakes = reader.read< std::uint16_t >();
+   auto numSnakes = reader.read< std::uint16_t >().value();
    snapshot.snakes.resize( numSnakes );
    for ( uint16_t i = 0; i < numSnakes; ++i ) {
       SnakeSnapshot snake;
-      snake.id = reader.read< ClientId >();
-      auto numBlocks = reader.read< std::uint16_t >();
+      snake.id = reader.read< ClientId >().value();
+      auto numBlocks = reader.read< std::uint16_t >().value();
       snake.blocks.resize( numBlocks );
       reader.readBytes< Coord >( snake.blocks );
       snapshot.snakes[ i ] = std::move( snake );
    }
-   auto numFood = reader.read< std::uint16_t >();
+   auto numFood = reader.read< std::uint16_t >().value();
    snapshot.food.resize( numFood );
    reader.readBytes< Coord >( snapshot.food );
 

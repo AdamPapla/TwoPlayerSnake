@@ -70,8 +70,9 @@ makeSnake( ClientId id, std::initializer_list< Coord > blocks ) {
 TEST( SerdesRoundTrip, EmptySnapshot ) {
    Snapshot original{};
 
-   auto bytes = write( original );
-   Snapshot decoded = read( bytes );
+   auto bytes = writeSnapshot( original );
+   BytesReader reader( bytes );
+   Snapshot decoded = readSnapshot( reader );
 
    EXPECT_TRUE( snapshotEqual( original, decoded ) );
 }
@@ -82,8 +83,9 @@ TEST( SerdesRoundTrip, SingleSnakeNoFood ) {
    original.snakes.push_back(
        makeSnake( 1, { makeCoord( 1, 1 ), makeCoord( 1, 2 ), makeCoord( 1, 3 ) } ) );
 
-   auto bytes = write( original );
-   Snapshot decoded = read( bytes );
+   auto bytes = writeSnapshot( original );
+   BytesReader reader( bytes );
+   Snapshot decoded = readSnapshot( reader );
 
    EXPECT_TRUE( snapshotEqual( original, decoded ) );
 }
@@ -99,8 +101,9 @@ TEST( SerdesRoundTrip, MultipleSnakesAndFood ) {
 
    original.food = { makeCoord( 10, 10 ), makeCoord( 3, 7 ), makeCoord( 8, 2 ) };
 
-   auto bytes = write( original );
-   Snapshot decoded = read( bytes );
+   auto bytes = writeSnapshot( original );
+   BytesReader reader( bytes );
+   Snapshot decoded = readSnapshot( reader );
 
    EXPECT_TRUE( snapshotEqual( original, decoded ) );
 }
@@ -117,8 +120,9 @@ TEST( SerdesRoundTrip, LargeSnake ) {
 
    original.snakes.push_back( snake );
 
-   auto bytes = write( original );
-   Snapshot decoded = read( bytes );
+   auto bytes = writeSnapshot( original );
+   BytesReader reader( bytes );
+   Snapshot decoded = readSnapshot( reader );
 
    EXPECT_TRUE( snapshotEqual( original, decoded ) );
 }
